@@ -9,7 +9,7 @@ st.set_page_config(layout="wide")
 
 st.title('Eddy Current')
 
-DATA_URL = ('RAW_Coletados.parquet')
+# DATA_URL = ('RAW_Coletados.parquet')
 
 @st.cache_data
 def load_data(data_path):
@@ -28,9 +28,13 @@ st.sidebar.header('Configuration')
 # Collects user input features into dataframe
 uploaded_file = st.sidebar.file_uploader("Upload your input PARQUET file", type=["xlsx"])
 if uploaded_file is not None:
-    data = load_data_excel(uploaded_file)
+    st.subheader('Selected')
+    data = pd.read_excel(uploaded_file)
+    # data = load_data_excel(uploaded_file)
 else:
-    data = load_data(DATA_URL)
+    st.subheader('Default')
+    data = pd.read_parquet('RAW_Coletados.parquet')
+    # data = load_data(DATA_URL)
 
 # frequency_Hz = st.sidebar.slider('Frequency (Hz)', 0, 15000, 10000)
 
@@ -67,12 +71,16 @@ f = np.fft.fftfreq(N,T)
 transf = np.fft.fft(data.Column1) #transformada
 transf = np.abs(transf)
 
-sig1 = data.Column1
-sig2 = data.Column2
+
+x_axis = st.sidebar.selectbox('X axis',('Column1','Column2','Column3','Column4','Column5'),index=0)
+y_axis = st.sidebar.selectbox('Y axis',('Column1','Column2','Column3','Column4','Column5'),index=1)
+
+sig1 = data[x_axis]
+sig2 = data[y_axis]
 
 
 b1 = st.sidebar.slider('The order of the filter', 0, 10, 1)
-b2 = st.sidebar.slider('The critical frequency or frequencies', 1, 10, 1)
+b2 = st.sidebar.slider('The critical frequency or frequencies', 1, 100, 1)
 
 sos = signal.butter(b1, b2, 'lowpass', fs=10000, output='sos')
 filtered = signal.sosfilt(sos, sig1)
@@ -87,13 +95,13 @@ ax_dict = fig.subplot_mosaic(
 )
 delay = 0.01
 
-sns.scatterplot(x=t, y=data.Column1, s=1, color='.15', ax=ax_dict["x"])
+sns.scatterplot(x=t, y=sig1, s=1, color='.15', ax=ax_dict["x"])
 sns.scatterplot(x=t-delay, y=filtered, s=1, color='yellow', ax=ax_dict["x"])
 
-sns.scatterplot(x=t, y=data.Column2, s=1, color='.15', ax=ax_dict["y"])
+sns.scatterplot(x=t, y=sig2, s=1, color='.15', ax=ax_dict["y"])
 sns.scatterplot(x=t-delay, y=filtered2, s=1, color='yellow', ax=ax_dict["y"])
 
-sns.scatterplot(x=data.Column1, y=data.Column2, s=1, color='.15', ax=ax_dict["out"])
+sns.scatterplot(x=sig1, y=sig2, s=1, color='.15', ax=ax_dict["out"])
 sns.scatterplot(x=filtered, y=filtered2, s=1, color='yellow', ax=ax_dict["out"])
 
 st.pyplot(fig)
