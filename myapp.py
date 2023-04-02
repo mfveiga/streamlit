@@ -3,7 +3,7 @@ import pandas as pd
 
 st.title('Eddy Current')
 
-DATA_URL = ('https://github.com/mfveiga/streamlit/blob/9610eb040305a6a4c0bc3ed625749a5f6071ef0b/RAW_Coletados.parquet')
+DATA_URL = ('RAW_Coletados.parquet')
 
 @st.cache_data
 def load_data(data_path):
