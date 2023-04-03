@@ -71,8 +71,8 @@ transf = np.fft.fft(data.Column1) #transformada
 transf = np.abs(transf)
 
 
-x_axis = st.sidebar.selectbox('X axis',('Column1','Column2','Column3','Column4','Column5'),index=0)
-y_axis = st.sidebar.selectbox('Y axis',('Column1','Column2','Column3','Column4','Column5'),index=1)
+x_axis = st.sidebar.selectbox('X axis',('Column1','Column2','Column3','Column4','Column5'),index=2)
+y_axis = st.sidebar.selectbox('Y axis',('Column1','Column2','Column3','Column4','Column5'),index=3)
 
 sig1 = data[x_axis]
 sig2 = data[y_axis]
