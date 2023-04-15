@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from scipy import signal, ndimage
 import numpy as np
+from numpy import sin, cos, pi, linspace
 
 st.set_page_config(layout="wide")
 
@@ -23,7 +25,8 @@ def load_data_excel(data_path):
     #df = pd.read_parquet('Filtrado.parquet')
     return df
 
-st.sidebar.header('Configuration')
+st.sidebar.title('Configuration')
+st.sidebar.header('Data')
 
 # Collects user input features into dataframe
 uploaded_file = st.sidebar.file_uploader("Upload your input PARQUET file", type=["xlsx"])
@@ -121,6 +124,11 @@ if sig==0:
 
 ps = st.sidebar.slider('marker size in points', min_value=0.0, max_value=2.0, value=1.0, step=0.25)
 
+st.sidebar.header('Circle')
+red_cicle = st.sidebar.slider('define radius angle', min_value=0.0, max_value=360.0, value=25.0, step=5.0)
+start_ang = st.sidebar.slider('define start angle', min_value=0.0, max_value=360.0, value=0.0, step=5.0)
+end_ang = st.sidebar.slider('define end angle', min_value=0.0, max_value=360.0, value=90.0, step=5.0)
+
 p1 = ndimage.gaussian_filter1d(sig1, sigma=sig)
 p2 = ndimage.gaussian_filter1d(sig2, sigma=sig)
 
@@ -134,14 +142,27 @@ ax_dict2 = fig2.subplot_mosaic(
     ],
 )
 
-sns.scatterplot(x=t, y=sig1, s=ps, color='.15', ax=ax_dict2["a"])
-sns.scatterplot(x=t, y=p1, s=ps, color='gold', ax=ax_dict2["a"])
+sns.scatterplot(x=t, y=sig1, s=ps, color='.25', ax=ax_dict2["a"], edgecolor="none")
+sns.scatterplot(x=t, y=p1, s=ps, color='gold', ax=ax_dict2["a"], edgecolor="none")
 
-sns.scatterplot(x=t, y=sig2, s=ps, color='.15', ax=ax_dict2["b"])
-sns.scatterplot(x=t, y=p2, s=ps, color='gold', ax=ax_dict2["b"])
+sns.scatterplot(x=t, y=sig2, s=ps, color='.25', ax=ax_dict2["b"], edgecolor="none")
+sns.scatterplot(x=t, y=p2, s=ps, color='gold', ax=ax_dict2["b"], edgecolor="none")
 
-sns.scatterplot(x=sig1, y=sig2, s=ps, color='.15', ax=ax_dict2["c"])
-sns.scatterplot(x=p1, y=p2, s=ps, color='gold', ax=ax_dict2["c"])
+sns.scatterplot(x=sig1, y=sig2, s=ps, color='.25', ax=ax_dict2["c"], edgecolor="none")
+sns.scatterplot(x=p1, y=p2, s=ps, color='gold', ax=ax_dict2["c"], edgecolor="none")
+
+
+#draw a circle
+angles = linspace((start_ang*pi)/180, (end_ang*pi)/180, 200 )
+xs = red_cicle * cos(angles)
+ys = red_cicle * sin(angles)
+sns.scatterplot(x=xs, y=ys, s=5, color='red', ax=ax_dict2["c"], edgecolor="none")
+
+# circle1 = plt.Circle(xy=(0, 0), radius=red_cicle, color='red', fill=False)
+# ax_dict2["c"].add_patch(circle1)
+ax_dict2["c"].set(xlim=(-400, 400))
+ax_dict2["c"].set(ylim=(-400, 400))
+
 
 st.pyplot(fig2)
 
