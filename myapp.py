@@ -118,16 +118,26 @@ sig2 = data[y_axis]
 
 st.subheader('Graph -- gaussian_filter1d')
 
-sig = st.sidebar.slider('standard deviation for Gaussian kernel', min_value=0.0, max_value=100.0, value=50.0, step=5.0)
+sig = st.sidebar.slider('standard deviation for Gaussian kernel', min_value=0.0, max_value=100.0, value=20.0, step=5.0)
 if sig==0:
     sig=0.1
 
 ps = st.sidebar.slider('marker size in points', min_value=0.0, max_value=2.0, value=1.0, step=0.25)
 
-st.sidebar.header('Circle')
-red_cicle = st.sidebar.slider('define radius angle', min_value=0.0, max_value=360.0, value=25.0, step=5.0)
-start_ang = st.sidebar.slider('define start angle', min_value=0.0, max_value=360.0, value=0.0, step=5.0)
-end_ang = st.sidebar.slider('define end angle', min_value=0.0, max_value=360.0, value=90.0, step=5.0)
+# st.sidebar.header('Circle')
+# red_cicle = st.sidebar.slider('define radius angle', min_value=0.0, max_value=360.0, value=25.0, step=5.0)
+# start_ang = st.sidebar.slider('define start angle', min_value=0.0, max_value=360.0, value=0.0, step=5.0)
+# end_ang = st.sidebar.slider('define end angle', min_value=0.0, max_value=360.0, value=90.0, step=5.0)
+
+
+st.sidebar.header('Donut')
+donut_pos = st.sidebar.slider('position angle', min_value=0.0, max_value=180.0, value=73.0, step=1.0)
+donut_ang = st.sidebar.slider('width', min_value=0.0, max_value=180.0, value=15.0, step=1.0)
+donut_inner = st.sidebar.slider('inner radius', min_value=0.0, max_value=400.0, value=100.0, step=1.0)
+donut_outer = st.sidebar.slider('outer radius', min_value=0.0, max_value=400.0, value=300.0, step=1.0)
+# red_cicle = st.sidebar.slider('define radius angle', min_value=0.0, max_value=360.0, value=25.0, step=5.0)
+# start_ang = st.sidebar.slider('define start angle', min_value=0.0, max_value=360.0, value=0.0, step=5.0)
+# end_ang = st.sidebar.slider('define end angle', min_value=0.0, max_value=360.0, value=90.0, step=5.0)
 
 p1 = ndimage.gaussian_filter1d(sig1, sigma=sig)
 p2 = ndimage.gaussian_filter1d(sig2, sigma=sig)
@@ -151,12 +161,31 @@ sns.scatterplot(x=t, y=p2, s=ps, color='gold', ax=ax_dict2["b"], edgecolor="none
 sns.scatterplot(x=sig1, y=sig2, s=ps, color='.25', ax=ax_dict2["c"], edgecolor="none")
 sns.scatterplot(x=p1, y=p2, s=ps, color='gold', ax=ax_dict2["c"], edgecolor="none")
 
+# Define the parameters of the partial donuts
+center = [0, 0]
+inner_radius = donut_inner
+outer_radius = donut_outer
+width = outer_radius - inner_radius
+angle1_start = donut_pos-(donut_ang/2)
+angle1_end = donut_pos+(donut_ang/2)
+angle2_start = (donut_pos+180)-(donut_ang/2)
+angle2_end = (donut_pos+180)+(donut_ang/2)
 
-#draw a circle
-angles = linspace((start_ang*pi)/180, (end_ang*pi)/180, 200 )
-xs = red_cicle * cos(angles)
-ys = red_cicle * sin(angles)
-sns.scatterplot(x=xs, y=ys, s=5, color='red', ax=ax_dict2["c"], edgecolor="none")
+# Create the two sectors of the partial donuts
+# sector1 = patches.Wedge(center, outer_radius, angle1_start, angle1_end, width=width, edgecolor='blue', color='blue', alpha=0.15)
+# sector2 = patches.Wedge(center, outer_radius, angle2_start, angle2_end, width=width, edgecolor='red', color='red', alpha=0.15)
+sector1 = patches.Wedge(center, outer_radius, angle1_start, angle1_end, width=width, edgecolor='blue', lw=2, fill=False)
+sector2 = patches.Wedge(center, outer_radius, angle2_start, angle2_end, width=width, edgecolor='red', lw=2, fill=False)
+
+# Plot the scatter plot and the partial donuts
+ax_dict2["c"].add_artist(sector1)
+ax_dict2["c"].add_artist(sector2)
+
+# #draw a circle
+# angles = linspace((start_ang*pi)/180, (end_ang*pi)/180, 200 )
+# xs = red_cicle * cos(angles)
+# ys = red_cicle * sin(angles)
+# sns.scatterplot(x=xs, y=ys, s=5, color='red', ax=ax_dict2["c"], edgecolor="none")
 
 # circle1 = plt.Circle(xy=(0, 0), radius=red_cicle, color='red', fill=False)
 # ax_dict2["c"].add_patch(circle1)
